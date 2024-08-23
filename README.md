@@ -105,7 +105,7 @@ Use model weights from /weights directory, which are compatible with fastercnn-p
 
 Move train_frcnn.py into the top level of the fastercnn-pytorch-training-pipeline directory. 
 
-For using resnet18, move into fastercnn-pytorch-training-pipeline/ and update the __init__.py and any other code necessary.
+For using resnet18, move into fastercnn-pytorch-training-pipeline/models and update the __init__.py and any other code necessary.
 
 via SLURM: see sbatch_scripts/$dataset_name_frcnn_$model.sh
 
