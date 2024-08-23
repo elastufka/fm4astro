@@ -16,6 +16,18 @@ def jpg_loader(path):
     sample = Image.open(path)
     return sample
 
+class RegressionDataset(torch.utils.data.Dataset):
+    def __init__(self, X, y):
+        super().__init__()
+        self.X = torch.from_numpy(X.astype('float32'))
+        self.y = torch.from_numpy(y.astype('float32'))
+
+    def __len__(self):
+        return len(self.X)
+    
+    def __getitem__(self, index):
+        return self.X[index], self.y[index].unsqueeze(0)
+
 class COCODataset(DatasetFolder):
     def __init__(self, data_path, coco_path, transform=None, labels_from = "n_annotations", ext=".png"):
         #super().__init__(data_path, transform=transform, loader = loader)

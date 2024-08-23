@@ -39,7 +39,7 @@ def get_args():
     parser.add_argument('--use_fp16', dest="use_fp16",action = 'store_true',help='')
     parser.set_defaults(use_fp16=False)
     parser.add_argument('--img_fmt', default='npy', type=str,help='')
-    parser.add_argument('--dataset_train', default='.') 
+    parser.add_argument('--dataset_train', default='/path/to/GMNIST') 
 
     #parser.add_argument('--cuda', default=['0'], nargs='+', help='')
     args = parser.parse_args()
@@ -164,7 +164,7 @@ def run_main(args):
     trainer.save_metrics("train", train_results.metrics)
     trainer.save_state()
 
-    metrics = trainer.evaluate(prepared_ds['validation'])
+    metrics = trainer.evaluate(test_ds)
     trainer.log_metrics("eval", metrics)
     trainer.save_metrics("eval", metrics)
 

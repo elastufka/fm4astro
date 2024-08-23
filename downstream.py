@@ -1,16 +1,13 @@
 import argparse
-#import sys
-#sys.path.append('/home/users/l/lastufka')
-from feuerzeug.models import *
-from feuerzeug.evaluator import Evaluator
+from evaluator import Evaluator
 import yaml
-import glob
+import copy
 
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default="/home/glados/unix-Documents/AstroSignals/fm_compare/eval.yaml", type=str,help='')
-    parser.add_argument('--output_dir', default="/home/glados/unix-Documents/AstroSignals/fm_compare", type=str,help='')
+    parser.add_argument('--config', default="eval.yaml", type=str,help='')
+    parser.add_argument('--output_dir', default=".", type=str,help='')
     parser.add_argument('--project', default="FM_compare", type=str,help='')
     parser.add_argument('--ims_per_batch', default=8, type=int,help='')
     parser.add_argument('--imsize', default=640, type=int,help='detectron2 default')
@@ -19,7 +16,7 @@ def get_args():
     parser.add_argument('--lr', default=0.00005, type=float,help='')
     parser.add_argument('--log_best', action = 'store_true',help='')
     parser.add_argument('--img_fmt', default='npy', type=str,help='')
-    parser.add_argument('--dataset_train', default='/home/users/l/lastufka/scratch/MiraBest') #MGCLS_data/enhanced/test_data_prep_cs/train', help='')
+    parser.add_argument('--dataset_train', default='.') #MGCLS_data/enhanced/test_data_prep_cs/train', help='')
 
     #parser.add_argument('--cuda', default=['0'], nargs='+', help='')
     args = parser.parse_args()
@@ -30,47 +27,20 @@ def get_all_configs(config):
     output_dir = config['output_dir']
     inps = [] #all task inputs, to get the naming scheme
     configs = []
-    #arch = config["tags"]["pre-trained backbone"] #assuming this stays the same
-    # for task in config['tasks'].keys():
-    #     if task != 'log':
-    #         inp = config['tasks'][task]['input']
-    #     try:
-    #         inp = inp[0]['train']
-    #     except TypeError:
-    #         inp = inp[0]
-    #     inps.append(inp)
-    # headers = [inp[:inp.find(arch)] for inp in inps]
-    
-    trainfiles = sorted(glob.glob(os.path.join(output_dir,"*trainfeat*mean.pth")))
-    testfiles = sorted(glob.glob(os.path.join(output_dir,"*testfeat*mean.pth")))
-    trainfiles = [t[t.rfind("/")+1:] for t in trainfiles]
-    testfiles = [t[t.rfind("/")+1:] for t in testfiles]
-    #if len(trainfiles) == 0:
-    #    #only subdirs in the path
-    #    subdirs = sorted(glob.glob(os.path.join(output_dir,"*")))
-    #    featfiles = [os.path.join(s,inps[0]) for s in subdirs]
-    
-    for tf,ft in zip(trainfiles, testfiles):
+
+    if config['tags']['datasets'][0]['classify'] == 'RGZ':
+        plabels = [469,1408,2346] 
+    #elif config['tags']['datasets'][0]['classify'] == 'GZ10':
+    #    plabels = [1596,4788,7981]
+    else:
+        plabels = [800,2400,4000]
+
+    for nl in plabels: 
         new_config = copy.deepcopy(config)
-        #update tags
-        #epochs = int(f[f.find(arch)+len(arch)+1:-4])
-        arch = tf[tf.find("feat_")+5:tf.find("mean")-1]
-        print(arch)
-        new_config['tags']['pre-trained backbone'] = arch
-        #str_epochs = str(epochs).zfill(3)
-        #augmentations?
         
         for task in new_config['tasks'].keys():
-            if task == "linear":
-                new_config['tasks'][task]['input'] = [f"{head}{arch}_{str_epochs}.pth"]
-            elif task in ["classify", "similarity"]:
-                #try:
-                #    testfile = new_config['tasks'][task]['input'][0]['test'] 
-                #except KeyError:
-                #    testfile = new_config['tasks'][task]['input']['test']
-                #if testfile is not None:
-                 #   testfile = f"{testfile[:testfile.find(arch)]}{arch}_{str_epochs}.pth"
-                new_config['tasks'][task]['input'] = [{'train': tf, 'test': ft}]
+            if task in ["classify", "similarity"]:
+                new_config['tasks'][task]['hps']['n_train_labels'] = nl #['input'] = [{'train': tf, 'test': ft}]
         configs.append(new_config)
         #print(new_config)
         del new_config
@@ -79,13 +49,6 @@ def get_all_configs(config):
 def train_projector(args):
     with open(args.config, "r") as y:
         config = yaml.load(y, Loader = yaml.FullLoader)
-    # if config['all']:
-    #     configs = get_all_configs(config)
-    #     for config in configs:
-    #         ev = Evaluator(config, args.project, log_best = True)
-    #         print(config)
-    #         ev.evaluate()
-    # else:
     reps = config['reps']
     if config['all']:
         configs = get_all_configs(config)

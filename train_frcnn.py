@@ -49,7 +49,6 @@ import yaml
 import numpy as np
 import torchinfo
 import os
-import sys
 from myGRCNNtransform import GeneralizedRCNNTransform
 
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -455,29 +454,11 @@ def main(args):
                 val_map_05 = checkpoint['val_map_05']
 
     #freeze layers...
-    #print("args freeze:",args['freeze'])
     if args['freeze'] !=2: #for ViT right now
-        #print('freezing')
         if "vit" in args["model"]:
             model = freeze_ViT_blocks(model, nblocks = args['freeze'])
         else:
-            #print('resnet', args['freeze'],args['unfreeze_first'])
             model = freeze_resnet_layers(model, nlayers = args['freeze'], unfreeze_first_block = args['unfreeze_first'])
-#         count = 0
-#         nfrozen = args['freeze']
-#         for child in model.backbone.net.children():
-#             count +=1
-#             if count == 1:
-#                 for name, param in child.named_parameters():
-#                     param.requires_grad = True
-#             if count < nfrozen and count > 1: #don't freeze input layer
-#                 for name, param in child.named_parameters():
-#                     param.requires_grad = False
-#                     print(f"{name} frozen!")
-#             #elif count > 1:
-#             #    break
-
-#         print(f"Model layers 1 - {count} frozen")
                 
     # Make the model transform's `min_size` same as `imgsz` argument. 
     model.transform = GeneralizedRCNNTransform(args['imgsz'],800,[1,1,1],[1,1,1])
