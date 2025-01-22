@@ -18,6 +18,15 @@ Code for the paper submitted to **Vision foundation models: can they be applied 
 
 ### Feature extraction from foundation models
 
+Models used in this study (all available via HuggingFace):
+- microsoft/resnet-50
+- facebook/vit-msn-base
+- facebook/vit-mae-base
+- facebook/dinov2-base
+- openai/clip-vit-base-patch16
+- nvidia/AM-RADIO
+- google/siglip-base-patch16-224
+
 **ViT models**
 
 via SLURM: see sbatch_scripts/extract_feats_gmnist.sh and extract_feats_rgz.sh
