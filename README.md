@@ -1,6 +1,23 @@
 # fm4astro
 
-Code for the paper submitted to **Vision foundation models: can they be applied to astrophysics data?** submitted to *Foundation Models for Science: Progress, Opportunities, and Challenges* workshop for NeurIPS 2024.
+## Live demo walk-through
+
+Using frozen features extracted for particular models and datasets, the demo will show how galaxy morphology classification performance is affected by choice of foundation model and data characteristics.
+
+To facilitate real-time classification layer training, feature vectors will be reduced in dimension via PCA. Results will be visualized on a live-updating W&B dashboard.
+
+Models used in this study (all available via HuggingFace):
+- microsoft/resnet-50
+- facebook/vit-msn-base
+- facebook/vit-mae-base
+- facebook/dinov2-base
+- openai/clip-vit-base-patch16
+- nvidia/AM-RADIO
+- google/siglip-base-patch16-224
+
+Datasets used in this study:
+- GalaxyMNIST: optical galaxies, four classes
+- Radio Galaxy Zoo: radio galaxies, six classes
 
 ## Dependencies
 - PyTorch, torchvision, huggingface transformers
@@ -17,15 +34,6 @@ Code for the paper submitted to **Vision foundation models: can they be applied 
 ## Usage
 
 ### Feature extraction from foundation models
-
-Models used in this study (all available via HuggingFace):
-- microsoft/resnet-50
-- facebook/vit-msn-base
-- facebook/vit-mae-base
-- facebook/dinov2-base
-- openai/clip-vit-base-patch16
-- nvidia/AM-RADIO
-- google/siglip-base-patch16-224
 
 **ViT models**
 
